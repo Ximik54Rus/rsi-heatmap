@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>RSI Heatmap Top‑25 + Volume</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+<header class="top-nav">
+    <div class="brand">
+        <i class="fa-solid fa-chart-line" style="color:#0ecb81;margin-right:8px;"></i>
+        <h1>RSI Heatmap Top‑25</h1>
+    </div>
+    <div class="header-controls">
+        <div class="status-pill" id="connection-status">
+            <div class="pulsing-dot red"></div>
+            Connecting
+        </div>
+        <button id="theme-toggle" class="icon-btn">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="toolbar">
+        <div class="search-box">
+            <i class="fa-solid fa-search"></i>
+            <input id="search" placeholder="Поиск по символу (BTC, ETH)…">
+        </div>
+        <div class="stats-box">
+            Монет: <strong id="active-count">0</strong>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-responsive">
+            <table id="crypto-table">
+                <thead>
+                <tr>
+                    <th class="sticky-col sortable" data-sort="symbol">
+                        Монета <i class="fa-solid fa-sort sort-icon"></i>
+                    </th>
+                    <th class="sortable" data-sort="price">
+                        Цена <i class="fa-solid fa-sort sort-icon"></i>
+                    </th>
+                    <th class="sortable" data-sort="rsi_1m">1m <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" data-sort="rsi_3m">3m <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" data-sort="rsi_5m">5m <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" data-sort="rsi_15m">15m <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" data-sort="rsi_30m">30m <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" data-sort="rsi_1h">1h <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" data-sort="rsi_4h">4h <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" data-sort="rsi_12h">12h <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" data-sort="rsi_1d">1d <i class="fa-solid fa-sort sort-icon"></i></th>
+                </tr>
+                </thead>
+                <tbody id="table-body">
+                <tr>
+                    <td colspan="11" class="loading-state">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        Загрузка данных...
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="chart-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="modal-header"></div>
+        <canvas id="modal-chart" width="800" height="200"></canvas>
+    </div>
+</div>
+
+<div id="chart-tooltip" style="display:none;position:fixed;z-index:1100;"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
