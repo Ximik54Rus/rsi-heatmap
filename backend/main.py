@@ -53,22 +53,6 @@ async def load_top25_symbols():
         usdt = [d for d in data if d["symbol"].endswith(USDT)]
         usdt.sort(key=lambda x: float(x["quoteVolume"]), reverse=True)
         symbols_top25 = [d["symbol"] for d in usdt[:25]]
-        
-def rsi_numpy(values: list[float], period: int = 14) -> float | None:
-    if len(values) < period + 1:
-        return None
-    import numpy as np
-    arr = np.array(values, dtype=float)
-    deltas = np.diff(arr)
-    ups   = np.where(deltas > 0, deltas, 0.0)
-    downs = np.where(deltas < 0, -deltas, 0.0)
-    roll_up   = np.mean(ups[-period:])
-    roll_down = np.mean(downs[-period:])
-    if roll_down == 0:
-        return 100.0
-    rs  = roll_up / roll_down
-    rsi = 100.0 - (100.0 / (1.0 + rs))
-    return float(rsi)
 
 def calc_rsi(symbol: str, tf: str):
     vals = list(closes[symbol][tf])
@@ -76,6 +60,25 @@ def calc_rsi(symbol: str, tf: str):
     if rsi is not None:
         rsi_cache[symbol][tf] = rsi
 
+def rsi_numpy(values: list[float], period: int = 14) -> float | None:
+    if len(values) < period + 1:
+        return None
+    import numpy as np
+    arr = np.array(values, dtype=float)
+    deltas = np.diff(arr)
+
+    gains = np.where(deltas > 0, deltas, 0.0)
+    losses = np.where(deltas < 0, -deltas, 0.0)
+
+    avg_gain = np.mean(gains[-period:])
+    avg_loss = np.mean(losses[-period:])
+
+    if avg_loss == 0:
+        return 100.0
+
+    rs = avg_gain / avg_loss
+    rsi = 100.0 - (100.0 / (1.0 + rs))
+    return float(rsi)
 
 
 async def prefill_history():
@@ -178,4 +181,5 @@ async def ws_endpoint(ws: WebSocket):
             await asyncio.sleep(1)
     except Exception:
         pass
+
 
