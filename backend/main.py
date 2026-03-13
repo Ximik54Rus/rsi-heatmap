@@ -64,22 +64,34 @@ def calc_rsi(symbol: str, tf: str):
 def rsi_numpy(values: list[float], period: int = 14) -> float | None:
     if len(values) < period + 1:
         return None
+    
     import numpy as np
-    arr = np.array(values, dtype=float)
-    deltas = np.diff(arr)
-
+    
+    # Конвертируем в массив numpy
+    closes = np.array(values, dtype=float)
+    deltas = np.diff(closes)
+    
+    # Разделяем на положительные и отрицательные изменения
     gains = np.where(deltas > 0, deltas, 0.0)
     losses = np.where(deltas < 0, -deltas, 0.0)
-
-    avg_gain = np.mean(gains[-period:])
-    avg_loss = np.mean(losses[-period:])
-
+    
+    # Первое значение - обычное среднее за период
+    avg_gain = np.mean(gains[:period])
+    avg_loss = np.mean(losses[:period])
+    
+    # Считаем сглаженное среднее по Уайлдеру для остальных баров
+    for i in range(period, len(deltas)):
+        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
+        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
+        
     if avg_loss == 0:
         return 100.0
-
+        
     rs = avg_gain / avg_loss
     rsi = 100.0 - (100.0 / (1.0 + rs))
+    
     return float(rsi)
+
 
 
 async def prefill_history():
