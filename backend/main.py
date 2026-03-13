@@ -132,7 +132,10 @@ async def updater_loop():
                         volumes[sym][tf].append(last_vol)
                         calc_rsi(sym, tf)
             await asyncio.sleep(30)
-
+            
+@app.get("/health")
+async def health():
+    return {"status": "ok", "symbols": len(symbols_top25)}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -181,5 +184,6 @@ async def ws_endpoint(ws: WebSocket):
             await asyncio.sleep(1)
     except Exception:
         pass
+
 
 
