@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 
 import aiohttp
 import numpy as np
-import talib
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -54,13 +53,29 @@ async def load_top25_symbols():
         usdt = [d for d in data if d["symbol"].endswith(USDT)]
         usdt.sort(key=lambda x: float(x["quoteVolume"]), reverse=True)
         symbols_top25 = [d["symbol"] for d in usdt[:25]]
-
+        
+def rsi_numpy(values: list[float], period: int = 14) -> float | None:
+    if len(values) < period + 1:
+        return None
+    import numpy as np
+    arr = np.array(values, dtype=float)
+    deltas = np.diff(arr)
+    ups   = np.where(deltas > 0, deltas, 0.0)
+    downs = np.where(deltas < 0, -deltas, 0.0)
+    roll_up   = np.mean(ups[-period:])
+    roll_down = np.mean(downs[-period:])
+    if roll_down == 0:
+        return 100.0
+    rs  = roll_up / roll_down
+    rsi = 100.0 - (100.0 / (1.0 + rs))
+    return float(rsi)
 
 def calc_rsi(symbol: str, tf: str):
-    arr = np.array(closes[symbol][tf], dtype=float)
-    if len(arr) >= 14:
-        rsi = talib.RSI(arr, timeperiod=14)[-1]
-        rsi_cache[symbol][tf] = float(rsi)
+    vals = list(closes[symbol][tf])
+    rsi = rsi_numpy(vals, period=14)
+    if rsi is not None:
+        rsi_cache[symbol][tf] = rsi
+
 
 
 async def prefill_history():
@@ -163,3 +178,4 @@ async def ws_endpoint(ws: WebSocket):
             await asyncio.sleep(1)
     except Exception:
         pass
+
