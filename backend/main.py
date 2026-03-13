@@ -44,19 +44,15 @@ async def fetch_json(session: aiohttp.ClientSession, url: str, params=None):
 
 async def load_top25_symbols():
     global symbols_top25
-    url = f"{BINANCE_REST}/api/v3/ticker/24hr"
-    print(f"Loading top‑25 from {url}")
-    async with aiohttp.ClientSession() as session:
-        data = await fetch_json(session, url)
-        if not data:
-            print("❌ Binance /ticker/24hr failed, using fallback")
-            symbols_top25 = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]
-            return
-        print(f"✅ Loaded {len(data)} tickers")
-        usdt = [d for d in data if d["symbol"].endswith(USDT)]
-        usdt.sort(key=lambda x: float(x["quoteVolume"]), reverse=True)
-        symbols_top25 = [d["symbol"] for d in usdt[:25]]
-        print(f"✅ Top‑25: {symbols_top25[:3]}...")
+    # HARDCODED top‑25 (если Binance не отвечает)
+    symbols_top25 = [
+        "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT",
+        "DOGEUSDT", "ADAUSDT", "TRXUSDT", "AVAXUSDT", "SHIBUSDT",
+        "LINKUSDT", "DOTUSDT", "MATICUSDT", "LTCUSDT", "BCHUSDT",
+        "NEARUSDT", "UNIUSDT", "ICPUSDT", "PEPEUSDT", "ETCUSDT",
+        "STXUSDT", "KASUSDT", "APTUSDT", "HBARUSDT", "FILUSDT"
+    ]
+    print(f"✅ HARDCODED top‑25: {symbols_top25[:3]}...")
 
 
 def calc_rsi(symbol: str, tf: str):
